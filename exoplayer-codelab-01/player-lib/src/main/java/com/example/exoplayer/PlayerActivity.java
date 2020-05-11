@@ -24,6 +24,7 @@ import android.view.View;
 
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.ui.PlayerView;
@@ -87,8 +88,9 @@ public class PlayerActivity extends AppCompatActivity {
     player = ExoPlayerFactory.newSimpleInstance(this);
     playerView.setPlayer(player);
 
-    Uri uri = Uri.parse(getString(R.string.media_url_mp4));
-    MediaSource mediaSource = buildMediaSource(uri);
+    Uri uri1 = Uri.parse(getString(R.string.media_url_mp4));
+    Uri uri2 = Uri.parse(getString(R.string.media_url_mp3));
+    MediaSource mediaSource = buildMediaSource(uri1, uri2);
 
     player.setPlayWhenReady(playWhenReady);
     player.seekTo(currentWindow, playbackPosition);
@@ -105,11 +107,15 @@ public class PlayerActivity extends AppCompatActivity {
     }
   }
 
-  private MediaSource buildMediaSource(Uri uri) {
+  private MediaSource buildMediaSource(Uri uri1, Uri uri2) {
     DataSource.Factory dataSourceFactory =
             new DefaultDataSourceFactory(this, "exoplayer-codelab");
-    return new ProgressiveMediaSource.Factory(dataSourceFactory)
-            .createMediaSource(uri);
+    ProgressiveMediaSource.Factory mediaSourceFactory = new ProgressiveMediaSource.Factory(dataSourceFactory);
+
+    MediaSource mediaSource1 = mediaSourceFactory.createMediaSource(uri1);
+    MediaSource mediaSource2 = mediaSourceFactory.createMediaSource(uri2);
+
+    return new ConcatenatingMediaSource(mediaSource1, mediaSource2);
   }
 
   @SuppressLint("InlinedApi")
